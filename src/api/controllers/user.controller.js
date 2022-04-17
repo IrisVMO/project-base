@@ -1,35 +1,31 @@
 const { StatusCodes } = require('http-status-codes')
 const bcrypt = require('bcrypt')
 const path = require('path')
-const fs = require('fs')
-const APIStatus = require('../constants/APIStatus')
-const APIRespone = require('../utils/APIRespone')
+const CustomError = require('../errors/customError')
+const errorCode = require('../errors/errorCode')
+const { ResponseResult } = require('../../configs/config')
 const { createUser, getOneUser, getAllUser, upPathfile } = require('../services/user.service')
-const apiRespone = require('../utils/APIRespone')
 
-const signup = async (req, res, next) => {
+const signup = async (req, res) => {
   const { email, userName, password } = req.body
 
-  const [ checkEmail, checkUserName ] = await Promise.all([getOneUser({ email }), getOneUser({ userName })])
+  const [checkEmail, checkUserName] = await Promise.all([
+    getOneUser({ email }),
+    getOneUser({ userName })
+  ])
 
-  if(checkEmail) {
-    return res.status(StatusCodes.BAD_REQUEST)
-      .json(APIRespone({ status: APIStatus.FAIL, msg: 'Email is existed'}))
+  if (checkEmail) {
+    throw new CustomError(errorCode.CONFLICT, 'Email đã tồn tại')
   }
-  if(checkUserName) {
-    return res.status(StatusCodes.BAD_REQUEST)
-      .join(apiRespone({status: APIStatus.FAIL, msg: 'Username is existed'}))
+  if (checkUserName) {
+    throw new CustomError(errorCode.CONFLICT, 'Username đã tồn tại')
   }
 
   const user = await createUser(email, userName, password)
   const token = user.createToken()
 
   res.status(StatusCodes.CREATED)
-    .json(APIRespone({
-      status: APIStatus.SUCCESS,
-      msg: 'Signup is successfully',
-      data: { token }
-    }))
+    .json(new ResponseResult(true, { user, token }))
 }
 
 const login = async (req, res, next) => {
@@ -37,8 +33,7 @@ const login = async (req, res, next) => {
   const user = await getOneUser({ userName })
 
   if (!user) {
-    res.status(StatusCodes.BAD_REQUEST)
-      .json(APIRespone({ status: APIStatus.FAIL }))
+    throw new Error('');
   }
 
   bcrypt.compare(password, user.password, (err, result) => {
@@ -46,44 +41,24 @@ const login = async (req, res, next) => {
       const token = user.createToken()
 
       res.status(StatusCodes.OK)
-        .json(APIRespone({
-          status: APIRespone.SUCCESS,
-          msg: 'Login is successfully',
-          data: { token }
-        }))
+        .json({ msg: 'Đăng nhập thành công', data: { token } })
     } else if (!err) {
       res.status(StatusCodes.BAD_REQUEST)
-        .json(APIRespone({
-          status: APIStatus.FAIL,
-          msg: 'Username or password wrong'
-        }))
-    } else {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json(APIRespone({
-          status: APIStatus.ERROR,
-          msg: 'Internal server error'
-        })
-        )
+        .json('Username hoặc mật khẩu sai')
     }
   })
 }
 
 const getInf = async (req, res, next) => {
   res.status(StatusCodes.OK)
-    .json(APIRespone({
-      status: APIStatus.SUCCESS,
-      data: { info: req.user }
-    }))
+    .json(req.user)
 }
 
 const getAll = async (req, res, next) => {
   const rs = await getAllUser()
 
   res.status(StatusCodes.OK)
-    .json(APIRespone({
-      status: APIStatus.SUCCESS,
-      data: { Users: rs }
-    }))
+    .json(rs)
 }
 
 const getAvatar = async (req, res, next) => {
@@ -92,10 +67,7 @@ const getAvatar = async (req, res, next) => {
   const link = user.pathFileAvatar
 
   res.status(StatusCodes.OK)
-    .json(APIRespone({
-      status: APIStatus.SUCCESS,
-      data: { link }
-    }))
+    .json(link)
 }
 
 const upAvatar = async (req, res, next) => {
@@ -105,11 +77,7 @@ const upAvatar = async (req, res, next) => {
   const rs = await upPathfile(userId, link)
 
   res.status(StatusCodes.OK)
-    .json(APIRespone({
-      status: APIStatus.SUCCESS,
-      msg: 'Upload avatar successfully',
-      data: rs
-    }))
+    .json(rs)
 }
 
 module.exports = {

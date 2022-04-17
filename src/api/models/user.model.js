@@ -45,7 +45,7 @@ userSchema.methods.createToken = function (){
 
 userSchema.pre('save', async function (next) {
   const user = this
-  // console.log(this._id);
+  
   user.password = await bcrypt.hash(user.password, 10)
 
   next()

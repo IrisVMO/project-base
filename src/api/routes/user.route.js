@@ -8,10 +8,10 @@ const { signup, login, getInf, getAll, upAvatar } = require('../controllers/user
 
 const routes = express.Router()
 
-routes.get('/', auth, asynWrap(getInf))
+routes.get('/infor', auth, asynWrap(getInf))
 routes.get('/alluser',auth, asynWrap(getAll))
 routes.post('/signup', validate(sigupValidation), asynWrap(signup))
-routes.post('/login', validate(loginValidation), asynWrap(login))
-routes.post('/avatar', auth, uploadSingle, asynWrap(upAvatar))
+routes.post('/login', validate(loginValidation), login)
+routes.post('/avatar', auth, uploadSingle, upAvatar)
 
 module.exports = routes
