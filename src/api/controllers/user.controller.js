@@ -2,82 +2,72 @@ const { StatusCodes } = require('http-status-codes')
 const bcrypt = require('bcrypt')
 const path = require('path')
 const CustomError = require('../errors/customError')
-const errorCode = require('../errors/errorCode')
-const { ResponseResult } = require('../../configs/config')
+const transporter = require('../Helpers/email')
+const { ResponseResult, emailHelper } = require('../../configs/config')
 const { createUser, getOneUser, getAllUser, upPathfile } = require('../services/user.service')
 
 const signup = async (req, res) => {
   const { email, userName, password } = req.body
 
-  const [checkEmail, checkUserName] = await Promise.all([
+  const [emailIsExisted, userNameIsExisted] = await Promise.all([
     getOneUser({ email }),
     getOneUser({ userName })
   ])
-
-  if (checkEmail) {
-    throw new CustomError(errorCode.CONFLICT, 'Email đã tồn tại')
+  if (emailIsExisted) {
+    throw new CustomError(StatusCodes.CONFLICT, 'Email already exists')
   }
-  if (checkUserName) {
-    throw new CustomError(errorCode.CONFLICT, 'Username đã tồn tại')
+  if (userNameIsExisted) {
+    throw new CustomError(StatusCodes.CONFLICT, 'Username already exists')
   }
 
   const user = await createUser(email, userName, password)
   const token = user.createToken()
 
-  res.status(StatusCodes.CREATED)
-    .json(new ResponseResult(true, { user, token }))
-}
-
-const login = async (req, res, next) => {
-  const { userName, password } = req.body
-  const user = await getOneUser({ userName })
-
-  if (!user) {
-    throw new Error('');
+  const options = {
+    from: emailHelper,
+    to: email,
+    subject: 'Wellcom to project-base',
+    accessToken: token,
+    text: 'Active email'
   }
 
-  bcrypt.compare(password, user.password, (err, result) => {
-    if (result) {
-      const token = user.createToken()
+  transporter.sendMail(options)
 
-      res.status(StatusCodes.OK)
-        .json({ msg: 'Đăng nhập thành công', data: { token } })
-    } else if (!err) {
-      res.status(StatusCodes.BAD_REQUEST)
-        .json('Username hoặc mật khẩu sai')
-    }
-  })
+  res.json(new ResponseResult(true, { user, token }))
 }
 
-const getInf = async (req, res, next) => {
-  res.status(StatusCodes.OK)
-    .json(req.user)
+const login = async (req, res) => {
+  const { userName, password } = req.body
+
+  const user = await getOneUser({ userName })
+  if (!user) {
+    throw new CustomError(StatusCodes.BAD_REQUEST, 'Username or password wrong')
+  }
+
+  const result = bcrypt.compareSync(password, user.password)
+  if (result) {
+    const token = user.createToken()
+    res.json(new ResponseResult(true, { msg: 'Login is successfully', token }))
+  } else {
+    throw new CustomError(StatusCodes.BAD_REQUEST, 'Username or password wrong')
+  }
 }
 
-const getAll = async (req, res, next) => {
+const getInf = async (req, res) => {
+  res.json(new ResponseResult(true, { infor: req.user }))
+}
+
+const getAll = async (req, res) => {
   const rs = await getAllUser()
 
-  res.status(StatusCodes.OK)
-    .json(rs)
+  res.json(new ResponseResult(true, rs))
 }
 
-const getAvatar = async (req, res, next) => {
-  const { _id: userId } = req.user
-  const user = await getOneUser({ userId })
-  const link = user.pathFileAvatar
-
-  res.status(StatusCodes.OK)
-    .json(link)
-}
-
-const upAvatar = async (req, res, next) => {
+const upAvatar = async (req, res) => {
   const { _id: userId } = req.user
   const link = path.join('../../../images', req.file.originalname)
-
   const rs = await upPathfile(userId, link)
-
-  res.status(StatusCodes.OK)
-    .json(rs)
+  res.json(new ResponseResult(true, rs))
 }
 
 module.exports = {
@@ -85,6 +75,5 @@ module.exports = {
   login,
   getInf,
   getAll,
-  upAvatar,
-  getAvatar
+  upAvatar
 }

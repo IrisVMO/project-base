@@ -11,7 +11,7 @@ const routes = express.Router()
 routes.get('/infor', auth, asynWrap(getInf))
 routes.get('/alluser',auth, asynWrap(getAll))
 routes.post('/signup', validate(sigupValidation), asynWrap(signup))
-routes.post('/login', validate(loginValidation), login)
-routes.post('/avatar', auth, uploadSingle, upAvatar)
+routes.post('/login', validate(loginValidation), asynWrap(login))
+routes.patch('/avatar', auth, uploadSingle, asynWrap(upAvatar))
 
 module.exports = routes
