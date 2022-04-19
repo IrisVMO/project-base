@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     required: true
   },
-  userName: {
+  username: {
     type: String,
     trim: true,
     maxlength: 50,
@@ -26,27 +26,38 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
     require: true
-  }
+  },
+  tokens: [
+    {
+      token: {
+        type: String
+      }
+    }
+  ]
 },
-  {
-    timestamps: true
-  }
+{
+  timestamps: true
+}
 )
 
-userSchema.methods.createToken = function (){
+userSchema.methods.createToken = function () {
   const user = this
   const token = jwt.sign(
     { _id: user._id },
     jwtKey,
     { expiresIn: '10days' }
   )
+
+  user.tokens = user.tokens.concat({ token })
+  user.save()
+
   return token
 }
 
 userSchema.pre('save', async function (next) {
   const user = this
-  
-  user.password = await bcrypt.hash(user.password, 10)
+  const salt = await bcrypt.genSalt(10)
+  user.password = await bcrypt.hash(user.password, salt)
 
   next()
 })

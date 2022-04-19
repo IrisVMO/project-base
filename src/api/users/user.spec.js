@@ -1,15 +1,16 @@
 const chai = require('chai')
 const chaiHttp = require('chai-http')
 const app = require('../../../index')
-const User = require('../models/user.model')
-
+const User = require('./user.model')
 const expect = chai.expect
 
 const testData = {
   user: {
-    userName: 'awer',
+    username: 'awer',
     password: 'naaaam0123',
-    email: 'abcs@gmail.com'
+    passwordmin: 123,
+    email: 'abcs@gmail.com',
+    emailErr: 'abcs.com'
   }
 }
 
@@ -25,7 +26,7 @@ describe('POST /api/users/signup', () => {
       .set('content-type', 'application/x-www-form-urlencoded')
       .send({
         email: testData.user.email,
-        userName: testData.user.userName,
+        username: testData.user.username,
         password: testData.user.password
       })
       .end((err, res) => {
@@ -39,6 +40,65 @@ describe('POST /api/users/signup', () => {
       })
   })
 
+  it('return 400 bad request when password length less than 6', (done) => {
+    chai
+      .request(app)
+      .post('/api/users/signup')
+      .set('content-type', 'application/x-www-form-urlencoded')
+      .send({
+        email: testData.user.email,
+        username: testData.user.username,
+        password: testData.user.passwordmin
+      })
+      .end((err, res) => {
+        expect(err).to.be.null
+        expect(res).to.have.status(400)
+        expect(res.body).to.have.property('success')
+        expect(res.body.data).to.have.property('message')
+        expect(res.body.success).to.equal(false)
+        done()
+      })
+  })
+  it('return 400 bad request when email format is incorrect', (done) => {
+    chai
+      .request(app)
+      .post('/api/users/signup')
+      .set('content-type', 'application/x-www-form-urlencoded')
+      .send({
+        email: testData.user.emailErr,
+        username: testData.user.username,
+        password: testData.user.password
+      })
+      .end((err, res) => {
+        expect(err).to.be.null
+        expect(res).to.have.status(400)
+        expect(res.body).to.have.property('success')
+        expect(res.body.data).to.have.property('message')
+        expect(res.body.success).to.equal(false)
+        done()
+      })
+  })
+
+  it('return 400 bad request when email or username null', (done) => {
+    chai
+      .request(app)
+      .post('/api/users/signup')
+      .set('content-type', 'application/x-www-form-urlencoded')
+      .send({
+        email: testData.user.emailErr,
+        username: testData.user.username,
+        password: testData.user.password
+      })
+      .end((err, res) => {
+        expect(err).to.be.null
+        expect(res).to.have.status(400)
+        expect(res.body).to.have.property('success')
+        expect(res.body.data).to.have.property('message')
+        expect(res.body.success).to.equal(false)
+        done()
+      })
+  })
+
   it('return 409 error when email is already registered', (done) => {
     chai
       .request(app)
@@ -46,7 +106,7 @@ describe('POST /api/users/signup', () => {
       .set('content-type', 'application/x-www-form-urlencoded')
       .send({
         email: testData.user.email,
-        userName: testData.user.userName,
+        username: testData.user.username,
         password: testData.user.password
       })
       .end((err, res) => {
@@ -67,7 +127,7 @@ describe('POST /api/users/login', () => {
       .post('/api/users/login')
       .set('content-type', 'application/x-www-form-urlencoded')
       .send({
-        userName: testData.user.userName,
+        username: testData.user.username,
         password: testData.user.password
       })
       .end((err, res) => {
@@ -82,13 +142,13 @@ describe('POST /api/users/login', () => {
       })
   })
 
-  it('return 400 error when userName or password wrong', (done) => {
+  it('return 400 error when username or password wrong', (done) => {
     chai
       .request(app)
       .post('/api/users/login')
       .set('content-type', 'application/x-www-form-urlencoded')
       .send({
-        userName: testData.user.userName,
+        username: testData.user.username,
         password: testData.user.password + 'haha'
       })
       .end((err, res) => {
@@ -119,9 +179,9 @@ describe('GET /api/users/info', () => {
         expect(res.body).to.have.property('data')
         expect(res.body.success).to.equal(true)
         expect(res.body.data).to.have.property('infor')
-        expect(res.body.data.infor).to.have.property('userName')
+        expect(res.body.data.infor).to.have.property('username')
         expect(res.body.data.infor).to.have.property('email')
-        expect(res.body.data.infor.userName).to.equal(testData.user.userName)
+        expect(res.body.data.infor.username).to.equal(testData.user.username)
         expect(res.body.data.infor.email).to.equal(testData.user.email)
         done()
       })

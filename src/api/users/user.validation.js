@@ -5,7 +5,7 @@ const sigupValidation = {
     email: Joi.string()
       .email()
       .required(),
-    userName: Joi.string()
+    username: Joi.string()
       .regex(/[a-zA-Z0-9]/)
       .max(50)
       .required(),
@@ -17,7 +17,7 @@ const sigupValidation = {
 
 const loginValidation = {
   body: Joi.object({
-    userName: Joi.string()
+    username: Joi.string()
       .regex(/[a-zA-Z0-9]/)
       .required(),
     password: Joi.string()
@@ -26,7 +26,20 @@ const loginValidation = {
   })
 }
 
+const updateValidation = {
+  body: Joi.object({
+    email: Joi.string()
+      .email(),
+    username: Joi.string()
+      .regex(/[a-zA-Z0-9]/)
+      .max(50),
+    password: Joi.string()
+      .min(6)
+  })
+}
+
 module.exports = {
   sigupValidation,
-  loginValidation
+  loginValidation,
+  updateValidation
 }

@@ -1,33 +1,33 @@
 const snakecaseKeys = require('snakecase-keys')
 const { StatusCodes } = require('http-status-codes')
-const { ResponseResult } = require('../../configs/config')
+const { APIResponse } = require('../../configs/config')
 const { ValidationError } = require('express-validation')
 
 function errorHandler(err, req, res, next) {
   const code = err.statusCode || err.code || StatusCodes.INTERNAL_SERVER_ERROR
   let errorCode = err.code
   let { message } = err
-  
+
   if (err instanceof ValidationError) {
-    message = err.details.body[0].message
-    return res.status(code).json(new ResponseResult(false, { code, message }))
+    const { message } = err.details.body[0]
+    return res.status(code).json(new APIResponse(false, { code, message }))
   } else {
     switch (code) {
       case StatusCodes.BAD_REQUEST:
-        message = message || 'Bad Request'
+        message = message
         break
       case StatusCodes.UNAUTHORIZED:
-        message = message || 'Unauthorized'
+        message = message
         break
       case StatusCodes.FORBIDDEN:
-        message = message || 'Forbidden'
+        message = message
         break
       case StatusCodes.NOT_FOUND:
-        message = message || 'Not Found'
+        message = message
         break
       case StatusCodes.CONFLICT:
         errorCode = StatusCodes.CONFLICT
-        message = message || 'Conflict resources'
+        message = message
         break
       case StatusCodes.INTERNAL_SERVER_ERROR:
         errorCode = StatusCodes.INTERNAL_SERVER_ERROR
@@ -40,8 +40,8 @@ function errorHandler(err, req, res, next) {
     return res.status(errorCode).json(
       snakecaseKeys(
         code
-          ? new ResponseResult(false, { code, message })
-          : new ResponseResult(false, { message })
+          ? new APIResponse(false, { code, message })
+          : new APIResponse(false, { message })
       )
     )
   }

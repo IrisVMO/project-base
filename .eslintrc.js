@@ -1,3 +1,16 @@
 module.exports = {
-  extends: "standard"
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es2021": true,
+    "mocha": true
+  },
+  "extends": [
+    "standard"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 13
+  },
+  "rules": {
+  }
 }
