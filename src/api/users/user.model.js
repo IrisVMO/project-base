@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
-const { jwtKey } = require('../../configs/config')
+const { jwtAccessKey, jwtRefreshKey } = require('../../configs/config')
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -26,32 +26,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
     require: true
-  },
-  tokens: [
-    {
-      token: {
-        type: String
-      }
-    }
-  ]
+  }
 },
-{
-  timestamps: true
-}
+  {
+    timestamps: true
+  }
 )
 
 userSchema.methods.createToken = function () {
   const user = this
-  const token = jwt.sign(
-    { _id: user._id },
-    jwtKey,
-    { expiresIn: '10days' }
-  )
-
-  user.tokens = user.tokens.concat({ token })
-  user.save()
-
-  return token
+  const accessToken = jwt.sign({ _id: user._id }, jwtAccessKey, { expiresIn: '10days' })
+  const refreshToken = jwt.sign({ _id: user._id }, jwtRefreshKey, { expiresIn: '10days' })
+  return { accessToken, refreshToken }
 }
 
 userSchema.pre('save', async function (next) {

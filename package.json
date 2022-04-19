@@ -6,7 +6,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "test": "env NODE_ENV=test mocha 'src/api/users' --exit",
+    "test": "env NODE_ENV=test mocha 'src/api/**/**.spec.js' --exit",
     "start": "nodemon index.js",
     "lint": "eslint index.js",
     "lint-fix": "eslint index.js --fix"

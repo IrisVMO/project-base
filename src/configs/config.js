@@ -1,7 +1,8 @@
 require('dotenv-safe').config()
 
 const port = process.env.PORT
-const jwtKey = process.env.JWT_KEY
+const jwtAccessKey = process.env.JWT_KEY_ACCESS
+const jwtRefreshKey = process.env.JWT_KEY_REFRESH
 const mongodbUri = process.env.NODE_ENV === 'test' ? process.env.MONGODB_URI_TEST : process.env.MONGODB_URI
 const emailHelper = process.env.EMAIL
 const password = process.env.PASSWORD
@@ -18,7 +19,8 @@ module.exports = {
     page: 1,
     records: 20
   },
-  jwtKey,
+  jwtAccessKey,
+  jwtRefreshKey,
   mongodbUri,
   port,
   emailHelper,

@@ -32,10 +32,6 @@ const upPathfile = async (userId, link) => {
   const user = await User.findOneAndUpdate({ userId }, { linkImage: link })
   return user
 }
-const logoutService = async (user, currentToken) => {
-  user.tokens = user.tokens.filter(({ token }) => token !== currentToken)
-  await user.save()
-}
 
 const deleteUserService = async (userId) => {
   const user = await User.findByIdAndDelete(userId)
@@ -47,6 +43,5 @@ module.exports = {
   getAllUser,
   updateInforService,
   upPathfile,
-  logoutService,
   deleteUserService
 }

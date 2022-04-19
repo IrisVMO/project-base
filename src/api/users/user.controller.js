@@ -4,36 +4,37 @@ const path = require('path')
 const APIError = require('../errors/APIError')
 const transporter = require('../Helpers/email')
 const { APIResponse, emailHelper, pagination } = require('../../configs/config')
-const { createUser, getOneUser, getAllUser, updateInforService, upPathfile, deleteUserService, logoutService } = require('./user.service')
+const { createUser, getOneUser, getAllUser, updateInforService, upPathfile, deleteUserService } = require('./user.service')
 
 const signup = async (req, res, next) => {
   try {
     const { email, username, password } = req.body
+
     const [emailIsExisted, usernameIsExisted] = await Promise.all([
       getOneUser({ email }),
       getOneUser({ username })
     ])
+
     if (emailIsExisted) {
       throw new APIError(StatusCodes.CONFLICT, 'Email already exists')
     }
+
     if (usernameIsExisted) {
       throw new APIError(StatusCodes.CONFLICT, 'Username already exists')
     }
 
     const user = await createUser(email, username, password)
-    const token = user.createToken()
 
     const options = {
       from: emailHelper,
       to: email,
       subject: 'Wellcom to project-base',
-      // accessToken: token,
       text: 'Active email'
     }
 
     transporter.sendMail(options)
 
-    res.json(new APIResponse(true, { token }))
+    res.json(new APIResponse(true, { user }))
   } catch (error) {
     next(error)
   }
@@ -55,6 +56,16 @@ const login = async (req, res, next) => {
     } else {
       throw new APIError(StatusCodes.BAD_REQUEST, 'username or password wrong')
     }
+  } catch (error) {
+    next(error)
+  }
+}
+
+const refreshNewToken = (req, res, next) => {
+  try {
+    const user = req.user
+    const { accessToken, refreshToken } = user.createToken()
+    res.json(new APIResponse(true, { accessToken }))
   } catch (error) {
     next(error)
   }
@@ -108,20 +119,11 @@ const updateInfor = async (req, res, next) => {
 const upAvatar = async (req, res, next) => {
   try {
     const { _id: userId } = req.user
-    const link = path.join('../../../images', req.file.originalname)
+    const link = path.join('./images', req.file.originalname)
 
     const rs = await upPathfile(userId, link)
 
     res.json(new APIResponse(true, rs))
-  } catch (error) {
-    next(error)
-  }
-}
-
-const logout = async (req, res, next) => {
-  try {
-    await logoutService(req.user, req.token)
-    res.json(new APIResponse(true, {}))
   } catch (error) {
     next(error)
   }
@@ -141,10 +143,10 @@ const deleteOneUser = async (req, res, next) => {
 module.exports = {
   signup,
   login,
+  refreshNewToken,
   getInf,
   getAll,
   upAvatar,
   updateInfor,
-  logout,
   deleteOneUser
 }

@@ -1,17 +1,18 @@
 const express = require('express')
 const { validate } = require('express-validation')
 const { auth } = require('../middlewares/auth')
+const { authRefresh } = require('../middlewares/auth.controller')
 const { uploadSingle } = require('../middlewares/uploadFile')
 const { sigupValidation, loginValidation, updateValidation } = require('./user.validation')
 const { 
   signup,
   login,
+  refreshNewToken,
   getInf,
   getAll,
   upAvatar,
   updateInfor,
-  deleteOneUser,
-  logout
+  deleteOneUser
 } = require('./user.controller')
 
 const routes = express.Router()
@@ -19,6 +20,8 @@ const routes = express.Router()
 routes.get('/infor', auth, getInf)
 
 routes.get('/alluser', auth, getAll)
+
+routes.get('/refreshtoken', authRefresh , refreshNewToken)
 
 /**
  * @swagger
@@ -37,14 +40,14 @@ routes.get('/alluser', auth, getAll)
  *         description: User Added Successfully.
  *       400:
  *         description: Bad Request
+ *       409:
+ *         description: Conflict
  */
 
 
 routes.post('/signup', validate(sigupValidation), signup)
 
 routes.post('/login', validate(loginValidation), login)
-
-routes.post('/logout', auth, logout)
 
 routes.patch('/update', auth, validate(updateValidation), updateInfor)
 
