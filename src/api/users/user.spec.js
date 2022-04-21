@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http')
 const app = require('../../../index')
 const User = require('./user.model')
 const expect = chai.expect
-
+const { describe, it, after } = require()
 const testData = {
   user: {
     username: 'awer',

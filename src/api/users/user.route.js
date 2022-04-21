@@ -4,7 +4,7 @@ const { auth } = require('../middlewares/auth')
 const { authRefresh } = require('../middlewares/authRefresh')
 const { uploadSingle } = require('../middlewares/uploadFile')
 const { sigupValidation, loginValidation, updateValidation } = require('./user.validation')
-const { 
+const {
   signup,
   login,
   refreshNewToken,
@@ -21,7 +21,7 @@ routes.get('/infor', auth, getInf)
 
 routes.get('/alluser', auth, getAll)
 
-routes.get('/refreshtoken', authRefresh , refreshNewToken)
+routes.get('/refreshtoken', authRefresh, refreshNewToken)
 
 /**
  * @swagger
@@ -34,6 +34,15 @@ routes.get('/refreshtoken', authRefresh , refreshNewToken)
  *      - in: body
  *        name: body
  *        required: true
+ *        schema:
+ *          type: object
+ *          properties:
+ *            username:
+ *              type: string
+ *            email:
+ *              type: string
+ *            password:
+ *              type: string
  *        description: Created user object
  *     responses:
  *       200:
@@ -43,7 +52,6 @@ routes.get('/refreshtoken', authRefresh , refreshNewToken)
  *       409:
  *         description: Conflict
  */
-
 
 routes.post('/signup', validate(sigupValidation), signup)
 

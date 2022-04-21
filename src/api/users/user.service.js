@@ -24,7 +24,7 @@ const getAllUser = async (query) => {
 }
 
 const updateInforService = async (email, username, userId) => {
-  const user = await User.findByIdAndUpdate(userId, { email: email, username: username })
+  const user = await User.findByIdAndUpdate(userId, { email, username })
   return user
 }
 

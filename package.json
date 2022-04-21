@@ -8,8 +8,8 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha 'src/api/**/**.spec.js' --exit",
     "start": "nodemon index.js",
-    "lint": "eslint index.js",
-    "lint-fix": "eslint index.js --fix"
+    "lint": "eslint **.js",
+    "lint-fix": "eslint **.js --fix"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
@@ -28,11 +28,15 @@
     "path": "^0.12.7",
     "snakecase-keys": "^5.4.1",
     "swagger-jsdoc": "^6.2.0",
-    "swagger-ui-dist": "^4.10.3",
     "swagger-ui-express": "^4.3.0"
   },
   "devDependencies": {
     "chai": "^4.3.6",
+    "eslint": "^8.13.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.1.0",
+    "eslint-plugin-promise": "^6.0.0",
     "nodemon": "^2.0.15"
   }
 }

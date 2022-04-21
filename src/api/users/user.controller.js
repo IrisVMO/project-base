@@ -65,7 +65,7 @@ const refreshNewToken = (req, res, next) => {
   try {
     const user = req.user
     const token = user.createToken()
-    res.json(new APIResponse(true, {message: 'Refresh token is successfully', token }))
+    res.json(new APIResponse(true, { message: 'Refresh token is successfully', token }))
   } catch (error) {
     next(error)
   }

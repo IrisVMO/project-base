@@ -3,7 +3,7 @@ const { StatusCodes } = require('http-status-codes')
 const { APIResponse } = require('../../configs/config')
 const { ValidationError } = require('express-validation')
 
-function errorHandler(err, req, res, next) {
+function errorHandler (err, req, res, next) {
   const code = err.statusCode || err.code || StatusCodes.INTERNAL_SERVER_ERROR
   let errorCode = err.code
   let { message } = err
@@ -14,27 +14,27 @@ function errorHandler(err, req, res, next) {
   } else {
     switch (code) {
       case StatusCodes.BAD_REQUEST:
-        message = message
+        message = message || 'BAD REQUEST'
         break
       case StatusCodes.UNAUTHORIZED:
-        message = message
+        message = message || 'UNAUTHORIZED'
         break
       case StatusCodes.FORBIDDEN:
-        message = message
+        message = message || 'FORBIDDEN'
         break
       case StatusCodes.NOT_FOUND:
-        message = message
+        message = message || 'NOT FOUND'
         break
       case StatusCodes.CONFLICT:
         errorCode = StatusCodes.CONFLICT
-        message = message
+        message = message || 'CONFLICT'
         break
       case StatusCodes.INTERNAL_SERVER_ERROR:
         errorCode = StatusCodes.INTERNAL_SERVER_ERROR
         message = message || 'Something went wrong'
         break
       default:
-        message = message
+        message = message || ''
         errorCode = 200
     }
     return res.status(errorCode).json(

@@ -28,9 +28,9 @@ const userSchema = new mongoose.Schema({
     require: true
   }
 },
-  {
-    timestamps: true
-  }
+{
+  timestamps: true
+}
 )
 
 userSchema.methods.createToken = function () {
