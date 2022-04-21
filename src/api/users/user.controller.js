@@ -52,7 +52,7 @@ const login = async (req, res, next) => {
     const result = bcrypt.compareSync(password, user.password)
     if (result) {
       const token = user.createToken()
-      res.json(new APIResponse(true, { msg: 'Login is successfully', token }))
+      res.json(new APIResponse(true, { message: 'Login is successfully', token }))
     } else {
       throw new APIError(StatusCodes.BAD_REQUEST, 'username or password wrong')
     }
@@ -64,8 +64,8 @@ const login = async (req, res, next) => {
 const refreshNewToken = (req, res, next) => {
   try {
     const user = req.user
-    const { accessToken, refreshToken } = user.createToken()
-    res.json(new APIResponse(true, { accessToken }))
+    const token = user.createToken()
+    res.json(new APIResponse(true, {message: 'Refresh token is successfully', token }))
   } catch (error) {
     next(error)
   }

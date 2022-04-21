@@ -1,12 +1,11 @@
 const { StatusCodes } = require('http-status-codes')
 const jwt = require('jsonwebtoken')
-const { jwtKey } = require('../../configs/config')
 const { getOneUser } = require('../users/user.service')
-const { APIResponse } = require('../../configs/config')
+const { APIResponse, jwtAccessKey } = require('../../configs/config')
 
 const decodeUserToken = async (token) => {
   try {
-    const decode = jwt.verify(token, jwtKey)
+    const decode = jwt.verify(token, jwtAccessKey)
     const user = await getOneUser({ _id: decode._id })
 
     return user

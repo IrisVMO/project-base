@@ -35,7 +35,6 @@ describe('POST /api/users/signup', () => {
         expect(res.body).to.have.property('success')
         expect(res.body).to.have.property('data')
         expect(res.body.success).to.equal(true)
-        expect(res.body.data).to.have.property('token')
         done()
       })
   })
@@ -137,7 +136,7 @@ describe('POST /api/users/login', () => {
         expect(res.body).to.have.property('data')
         expect(res.body.success).to.equal(true)
         expect(res.body.data).to.have.property('token')
-        token = res.body.data.token
+        token = res.body.data.token.accessToken
         done()
       })
   })

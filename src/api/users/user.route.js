@@ -1,7 +1,7 @@
 const express = require('express')
 const { validate } = require('express-validation')
 const { auth } = require('../middlewares/auth')
-const { authRefresh } = require('../middlewares/auth.controller')
+const { authRefresh } = require('../middlewares/authRefresh')
 const { uploadSingle } = require('../middlewares/uploadFile')
 const { sigupValidation, loginValidation, updateValidation } = require('./user.validation')
 const { 
