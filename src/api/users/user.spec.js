@@ -3,7 +3,8 @@ const chaiHttp = require('chai-http')
 const app = require('../../../index')
 const User = require('./user.model')
 const expect = chai.expect
-const { describe, it, after } = require()
+const { it, describe, after } = require('mocha')
+
 const testData = {
   user: {
     username: 'awer',
@@ -30,7 +31,7 @@ describe('POST /api/users/signup', () => {
         password: testData.user.password
       })
       .end((err, res) => {
-        expect(err).to.be.null
+        expect(err).to.equal(null)
         expect(res).to.have.status(200)
         expect(res.body).to.have.property('success')
         expect(res.body).to.have.property('data')
@@ -50,7 +51,7 @@ describe('POST /api/users/signup', () => {
         password: testData.user.passwordmin
       })
       .end((err, res) => {
-        expect(err).to.be.null
+        expect(err).to.equal(null)
         expect(res).to.have.status(400)
         expect(res.body).to.have.property('success')
         expect(res.body.data).to.have.property('message')
@@ -69,7 +70,7 @@ describe('POST /api/users/signup', () => {
         password: testData.user.password
       })
       .end((err, res) => {
-        expect(err).to.be.null
+        expect(err).to.equal(null)
         expect(res).to.have.status(400)
         expect(res.body).to.have.property('success')
         expect(res.body.data).to.have.property('message')
@@ -89,7 +90,7 @@ describe('POST /api/users/signup', () => {
         password: testData.user.password
       })
       .end((err, res) => {
-        expect(err).to.be.null
+        expect(err).to.equal(null)
         expect(res).to.have.status(400)
         expect(res.body).to.have.property('success')
         expect(res.body.data).to.have.property('message')
@@ -109,7 +110,7 @@ describe('POST /api/users/signup', () => {
         password: testData.user.password
       })
       .end((err, res) => {
-        expect(err).to.be.null
+        expect(err).to.equal(null)
         expect(res).to.have.status(409)
         expect(res.body).to.have.property('success')
         expect(res.body.data).to.have.property('message')
@@ -130,7 +131,7 @@ describe('POST /api/users/login', () => {
         password: testData.user.password
       })
       .end((err, res) => {
-        expect(err).to.be.null
+        expect(err).to.equal(null)
         expect(res).to.have.status(200)
         expect(res.body).to.have.property('success')
         expect(res.body).to.have.property('data')
@@ -151,7 +152,7 @@ describe('POST /api/users/login', () => {
         password: testData.user.password + 'haha'
       })
       .end((err, res) => {
-        expect(err).to.be.null
+        expect(err).to.equal(null)
         expect(res).to.have.status(400)
         expect(res.body).to.have.property('success')
         expect(res.body.success).to.equal(false)
@@ -172,7 +173,7 @@ describe('GET /api/users/info', () => {
       .get('/api/users/infor')
       .set({ Authorization: token })
       .end((err, res) => {
-        expect(err).to.be.null
+        expect(err).to.equal(null)
         expect(res).to.have.status(200)
         expect(res.body).to.have.property('success')
         expect(res.body).to.have.property('data')
@@ -191,7 +192,7 @@ describe('GET /api/users/info', () => {
       .get('/api/users/infor')
       .set({ Authorization: 'random' })
       .end((err, res) => {
-        expect(err).to.be.null
+        expect(err).to.equal(null)
         expect(res).to.have.status(400)
         expect(res.body).to.have.property('success')
         expect(res.body.data).to.have.property('massage')
